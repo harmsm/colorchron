@@ -1,0 +1,16 @@
+{
+    "ambient":{
+        "sensor_pin":23,
+        "min_out":0.05,
+        "max_out":1.0,
+        "min_meas":0,
+        "max_meas":255
+    },
+    "pin_numbers":[14,15,18],
+    "seconds_per_cycle":86400,
+    "pantone_zero_position":240,
+    "counterclockwise":1,
+    "update_interval":1.0,
+    "brightness":1.0,
+    "min_brightness":0.05
+}
