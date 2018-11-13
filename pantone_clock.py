@@ -24,82 +24,13 @@ is to be used with the clock.
 If run as a library, a clock instance can be created, started, and 
 stopped.  The clock runs on its own thread, so other processes may
 run after it spawns.
-
-import pantone_clock
-p = pantone_clock.PantoneClock([pin1,pin2,pin3])
-p.start()
 """
+
 __usage__ = "pantone_clock.py json_config_file"
 __author__ = "Michael J. Harms"
 __date__ = "2018-04-30"
 
 import time, datetime, json, sys, copy, multiprocessing, math
-
-import board
-import neopixel
-import smbus
-
-class AmbientLightSensor:
-    """
-    Read an ambient light sensor and return a value between min_out and
-    max_out.  Implemented for a CJMCU-3216 sensor plugged into I2C bus.
-    """
-
-    def __init__(self,
-                 sensor_bus=1,
-                 sensor_address=0x1E,
-                 low_address=0x0C,
-                 high_address=0x0D,
-                 min_out=0.05,max_out=1.0,
-                 min_meas=0,max_meas=65792):
-        """
-        sensor_bus: sensor bus value (1 for SDA/SCL on pi)
-        sensor_address: light sensor address
-        low_address: address for low-sensitivity sensor
-        high_address: address for high-sensitivity sensor
-        min_out: lowest value that will ever be put out by class 
-        max_out: highest value that will ever be put out by class 
-        min_meas: measurement value corresponding to min_out
-        max_meas: measurement value corresponding to max_out
-        """
-
-        self._sensor_bus = sensor_bus
-        self._sensor_address = sensor_address
-        self._low_address = low_address
-        self._high_address = high_address
-        self._min_out = min_out
-        self._max_out = max_out
-        self._min_meas = min_meas
-        self._max_meas = max_meas
-
-        # Define linear relationship between measurement and output values
-        self._slope = (self._max_out - self._min_out)/(self._max_meas - self._min_meas)
-        self._intercept = self._max_out - self._slope*self._max_meas
-
-        # Activate device
-        self._bus = smbus.SMBus(1)
-        self._bus.write_byte_data(self._sensor_address,0x00,0x01)
-  
-    @property
-    def brightness(self):
-        """
-        Return the brightness.
-        """
-
-        # Combine readings from low-sensitivity and high-sensitivity sensors
-        # to get full 16-bit range 
-        low =  self._bus.read_byte_data(self._sensor_address,self._low_address)
-        high = self._bus.read_byte_data(self._sensor_address,self._high_address)
-        value = (high << 8) + low
-
-        if value < self._min_meas:
-            return self._min_out
-
-        if value > self._max_meas:
-            return self._max_out
-
-        return self._intercept + self._slope*value
-          
 
 class PantoneClock:
     """
@@ -107,7 +38,6 @@ class PantoneClock:
     """
     
     def __init__(self,
-                 num_leds=15,
                  seconds_per_cycle=86400,
                  pantone_zero_position=240,
                  counterclockwise=True,
@@ -115,7 +45,6 @@ class PantoneClock:
                  brightness=1.0,
                  min_brightness=0.05):
         """
-        num_leds: number of leds in the array
         seconds_per_cycle: number of seconds that it takes to sweep the entire
                            RGB wheel.  86400 s corresponds to 24 hr
         pantone_zero_position: wheel position, in degrees, corresponding to 0
@@ -130,11 +59,6 @@ class PantoneClock:
                     sensor.
         min_brightness: minimum brightness of clock
         """
-
-        self._num_leds = num_leds
-        if self._num_leds <= 0:
-            err = "number of leds must be greater than zero.\n"
-            raise ValueError(err)
 
         self._sec_per_cycle = seconds_per_cycle
         if self._sec_per_cycle <= 0:
@@ -158,8 +82,6 @@ class PantoneClock:
         if self._min_brightness < 0 or self._min_brightness > 1:
             err = "minimum brightness must be between 0 and 1.\n"
             raise ValueError(err)
-
-        self._neopixels = neopixel.NeoPixel(board.D18, self._num_leds)
 
         # Put starting position in terms of a fraction of the total
         # sweep 
