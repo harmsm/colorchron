@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 __description__ = \
 """
 Control a pantone clock that displays an RGB value to represent time.  
@@ -14,12 +13,6 @@ sweep around the RGB colorwheel counterclockwise over 24 hours.
 
 The clock can also incorporate an optional ambient light sensor that dims
 the clock in the dark.
-
-If run as a standalone program, the library takes a json file containing
-the keyword arguments passed to PantoneClock.__init__.  The special 
-key "ambient" in that json file should contain a dictionary of keyword
-arguments for AmbientLightSensor.__init__, if an ambient light sensor
-is to be used with the clock.
 
 If run as a library, a clock instance can be created, started, and 
 stopped.  The clock runs on its own thread, so other processes may
@@ -98,6 +91,9 @@ class PantoneClock:
         # Configure intervals for cycling the clock
         self._intervals = [1/6.,3/6.,4/6.]
 
+        # Currently no led
+        self._led = None
+
         # Currently no light sensor
         self._light_sensor = None
 
@@ -169,8 +165,9 @@ class PantoneClock:
         for i in range(3):
             values.append(int(math.floor(bright_scalar*255*self.rgb[i]/total)))
 
-        for i in range(self._num_leds):
-            self._neopixels[i] = tuple(values)
+        values = tuple(values)
+        if self._led is not None:
+            self._led.set(values)
 
     def _run(self):
         """
@@ -206,6 +203,17 @@ class PantoneClock:
 
         self._process.terminate()
         self._running = False
+
+    def add_led(self,led):
+        """
+        """
+
+        self._led = led
+        try:
+            self._led.set
+        except AttributeError:
+            err = "LEDs not available.  Must have 'set' attribute.\n"
+            raise ValueError(err)
 
     def add_ambient_light_sensor(self,light_sensor):
         """
@@ -259,46 +267,4 @@ class PantoneClock:
         else:
             return self._light_sensor.brightness
                 
-
-def main(argv=None):
-
-    if argv is None:
-        argv = sys.argv[1:]
-
-    # Parse command line
-    try:
-        control_file = argv[0]
-    except IndexError:
-        err = "Incorrect arguments. Usage:\n\n{}\n\n".format(__usage__)
-        raise ValueError(err)
-
-    # load in json file
-    data = json.loads(open(control_file,'r').read())
-
-    # Parse configuration file.  Keys should be keyword arguments to 
-    # PantoneClock.__init__.  The key "ambient" is a special key that should
-    # point to a dictionary of keywords to be passed to 
-    # AmbientLightSensor.__init__.
-    ambient_kwargs = {}
-    pantone_kwargs = {}
-    for k in data.keys():
-        if k == "ambient":
-            ambient_kwargs = copy.deepcopy(data[k])
-        else:
-            pantone_kwargs[k] = copy.deepcopy(data[k])
-
-    # Create clock 
-    clock = PantoneClock(**pantone_kwargs) 
-    
-    # Potentially create an ambient light sensor
-    if len(ambient_kwargs) > 0:
-        light_sensor = AmbientLightSensor(**ambient_kwargs)
-        clock.add_ambient_light_sensor(light_sensor)
-   
-    # Start the clock 
-    clock.start() 
-  
-
-if __name__ == "__main__":
-    main()
 
