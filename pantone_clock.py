@@ -33,30 +33,40 @@ __usage__ = "pantone_clock.py json_config_file"
 __author__ = "Michael J. Harms"
 __date__ = "2018-04-30"
 
-#from RPi import GPIO
-import time, datetime, json, sys, copy, multiprocessing
+import time, datetime, json, sys, copy, multiprocessing, math
 
-#GPIO.setmode(GPIO.BCM)
+import board
+import neopixel
+import smbus
 
 class AmbientLightSensor:
     """
     Read an ambient light sensor and return a value between min_out and
-    max_out.
+    max_out.  Implemented for a CJMCU-3216 sensor plugged into I2C bus.
     """
 
     def __init__(self,
-                 sensor_pin,
+                 sensor_bus=1,
+                 sensor_address=0x1E,
+                 low_address=0x0C,
+                 high_address=0x0D,
                  min_out=0.05,max_out=1.0,
-                 min_meas=0,max_meas=255):
+                 min_meas=0,max_meas=65792):
         """
-        sensor_pin: GPIO pin to read (BCM numbering)
+        sensor_bus: sensor bus value (1 for SDA/SCL on pi)
+        sensor_address: light sensor address
+        low_address: address for low-sensitivity sensor
+        high_address: address for high-sensitivity sensor
         min_out: lowest value that will ever be put out by class 
         max_out: highest value that will ever be put out by class 
         min_meas: measurement value corresponding to min_out
         max_meas: measurement value corresponding to max_out
         """
 
-        self._sensor_pin = sensor_pin
+        self._sensor_bus = sensor_bus
+        self._sensor_address = sensor_address
+        self._low_address = low_address
+        self._high_address = high_address
         self._min_out = min_out
         self._max_out = max_out
         self._min_meas = min_meas
@@ -66,8 +76,9 @@ class AmbientLightSensor:
         self._slope = (self._max_out - self._min_out)/(self._max_meas - self._min_meas)
         self._intercept = self._max_out - self._slope*self._max_meas
 
-        # Set up pin
-        #GPIO.setup(self._sensor_pin,GPIO.IN)
+        # Activate device
+        self._bus = smbus.SMBus(1)
+        self._bus.write_byte_data(self._sensor_address,0x00,0x01)
   
     @property
     def brightness(self):
@@ -75,8 +86,11 @@ class AmbientLightSensor:
         Return the brightness.
         """
 
-        #value = GPIO.input(self._sensor_pin)
-        value = 255
+        # Combine readings from low-sensitivity and high-sensitivity sensors
+        # to get full 16-bit range 
+        low =  self._bus.read_byte_data(self._sensor_address,self._low_address)
+        high = self._bus.read_byte_data(self._sensor_address,self._high_address)
+        value = (high << 8) + low
 
         if value < self._min_meas:
             return self._min_out
@@ -89,11 +103,11 @@ class AmbientLightSensor:
 
 class PantoneClock:
     """
-    Control a pantone clock attached to three GPIO pins.
+    Control a pantone clock attached to DIN (pin 18). 
     """
     
     def __init__(self,
-                 pin_numbers,
+                 num_leds=15,
                  seconds_per_cycle=86400,
                  pantone_zero_position=240,
                  counterclockwise=True,
@@ -101,7 +115,7 @@ class PantoneClock:
                  brightness=1.0,
                  min_brightness=0.05):
         """
-        pin_numbers: list or tuple of 3 GPIO pins (BCM numbering)
+        num_leds: number of leds in the array
         seconds_per_cycle: number of seconds that it takes to sweep the entire
                            RGB wheel.  86400 s corresponds to 24 hr
         pantone_zero_position: wheel position, in degrees, corresponding to 0
@@ -117,12 +131,11 @@ class PantoneClock:
         min_brightness: minimum brightness of clock
         """
 
-        # Argument sanity checks
-        self._pin_numbers = pin_numbers[:]
-        if len(self._pin_numbers) != 3:
-            err = "clock requires three GPIO pins.\n"
+        self._num_leds = num_leds
+        if self._num_leds <= 0:
+            err = "number of leds must be greater than zero.\n"
             raise ValueError(err)
-        
+
         self._sec_per_cycle = seconds_per_cycle
         if self._sec_per_cycle <= 0:
             err = "seconds_per_cycle must be greater than zero.\n"
@@ -146,12 +159,7 @@ class PantoneClock:
             err = "minimum brightness must be between 0 and 1.\n"
             raise ValueError(err)
 
-        # Configure GPIO pins
-        self._pins = []
-        #for pin in self._pin_numbers:
-            #GPIO.setup(pin,GPIO.OUT)
-            #self._pins.append(GPIO.PWM(pin,50))
-            #self._pins[-1].start(50)
+        self._neopixels = neopixel.NeoPixel(board.D18, self._num_leds)
 
         # Put starting position in terms of a fraction of the total
         # sweep 
@@ -235,11 +243,12 @@ class PantoneClock:
         # This keeps the intensity the same, whether light is coming from
         # one or two output channels
         total = sum(self.rgb)
+        values = []
         for i in range(3):
-            value = bright_scalar*100*self.rgb[i]/total
-            print(value,end=" ")
-        #    self._pins[i].ChangeDutyCycle(value)
-        print("")
+            values.append(int(math.floor(bright_scalar*255*self.rgb[i]/total)))
+
+        for i in range(self._num_leds):
+            self._neopixels[i] = tuple(values)
 
     def _run(self):
         """
