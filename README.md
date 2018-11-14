@@ -86,7 +86,7 @@ clock.start()
 + Raspberry pi with necessary accessories (power supply, SD card, header pins,
   case)
 + 74AHCT125 logic-level converter OR 1N4001 diode to allow 3.3V logic on pi to
-  interface with 5V logic on LED array diode [see here](https://learn.adafruit.com/neopixels-on-raspberry-pi/raspberry-pi-wiring)
+  interface with 5V logic on LED array diode. [See here](https://learn.adafruit.com/neopixels-on-raspberry-pi/raspberry-pi-wiring).
 + String of WS2812 LEDs.
 + MJMCU 3216 ambient light sensor.  (If you use a different light sensor, it
   must connect via SDA/SCL.  You may have to change the addresses in the file
@@ -96,7 +96,7 @@ clock.start()
 
 ### Design
 
-[design here](link here)
+![design here](https://github.com/harmsm/pantone/raw/docs/design/pantone-clock.png)
 
 + I used a proximity sensor with similar pins in the diagram (not the MJMCU 
   3216) to avoid having to make a fritzing part just for this picture. 
@@ -107,5 +107,5 @@ clock.start()
 pi.  This works for <= 15 LEDs before exceeding the current available on that
 pin.  It also assumes you are not powering other peripherals (with the 
 exception of the ambient light sensor.  If you want to have more LEDs, use
-an external 5V power supply.  [see here](https://learn.adafruit.com/neopixels-on-raspberry-pi/raspberry-pi-wiring)**
+an external 5V power supply.  [See here](https://learn.adafruit.com/neopixels-on-raspberry-pi/raspberry-pi-wiring).**
 
