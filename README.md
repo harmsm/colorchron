@@ -104,7 +104,7 @@ sudo date -s '2018-11-14 11:26:00'
 
 ## Hardware
 
-[fritzing](https://http://fritzing.org) design files and pictures are of the
+[fritzing](http://fritzing.org) design files and pictures are of the
 build available in the `design/` directory.
 
 ### Parts list
