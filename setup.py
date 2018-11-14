@@ -19,5 +19,5 @@ setup(name='pantone',
       url='https://github.com/harmsm/pantone',
       download_url='https://github.com/harmsm/pantone/tarball/0.1',
       zip_safe=False,
-      install_requires=["rpi_ws281x","adafruit-circuitpython-neopixel","python3-smbus"],
+      install_requires=["rpi_ws281x","adafruit-circuitpython-neopixel"],
       classifiers=['Programming Language :: Python'])

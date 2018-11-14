@@ -69,9 +69,9 @@ sudo date -s '2018-11-14 11:26:00'
 2. Select `P5 I2C` and hit `Enter.`  
 3. Reboot the pi.
 
-### Install git
+### Install git and smbus
 
-1. At the command line, run `sudo apt-get install git`
+1. At the command line, run `sudo apt-get install git python3-smbus`
 2. Answer `Y` to any prompts.
 
 ### Install pantone clock
