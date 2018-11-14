@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 __description__ = \
 """
 Control a pantone clock that displays an RGB value to represent time.  
@@ -15,85 +14,23 @@ sweep around the RGB colorwheel counterclockwise over 24 hours.
 The clock can also incorporate an optional ambient light sensor that dims
 the clock in the dark.
 
-If run as a standalone program, the library takes a json file containing
-the keyword arguments passed to PantoneClock.__init__.  The special 
-key "ambient" in that json file should contain a dictionary of keyword
-arguments for AmbientLightSensor.__init__, if an ambient light sensor
-is to be used with the clock.
-
 If run as a library, a clock instance can be created, started, and 
 stopped.  The clock runs on its own thread, so other processes may
 run after it spawns.
-
-import pantone_clock
-p = pantone_clock.PantoneClock([pin1,pin2,pin3])
-p.start()
 """
+
 __usage__ = "pantone_clock.py json_config_file"
 __author__ = "Michael J. Harms"
 __date__ = "2018-04-30"
 
-#from RPi import GPIO
-import time, datetime, json, sys, copy, multiprocessing
-
-#GPIO.setmode(GPIO.BCM)
-
-class AmbientLightSensor:
-    """
-    Read an ambient light sensor and return a value between min_out and
-    max_out.
-    """
-
-    def __init__(self,
-                 sensor_pin,
-                 min_out=0.05,max_out=1.0,
-                 min_meas=0,max_meas=255):
-        """
-        sensor_pin: GPIO pin to read (BCM numbering)
-        min_out: lowest value that will ever be put out by class 
-        max_out: highest value that will ever be put out by class 
-        min_meas: measurement value corresponding to min_out
-        max_meas: measurement value corresponding to max_out
-        """
-
-        self._sensor_pin = sensor_pin
-        self._min_out = min_out
-        self._max_out = max_out
-        self._min_meas = min_meas
-        self._max_meas = max_meas
-
-        # Define linear relationship between measurement and output values
-        self._slope = (self._max_out - self._min_out)/(self._max_meas - self._min_meas)
-        self._intercept = self._max_out - self._slope*self._max_meas
-
-        # Set up pin
-        #GPIO.setup(self._sensor_pin,GPIO.IN)
-  
-    @property
-    def brightness(self):
-        """
-        Return the brightness.
-        """
-
-        #value = GPIO.input(self._sensor_pin)
-        value = 255
-
-        if value < self._min_meas:
-            return self._min_out
-
-        if value > self._max_meas:
-            return self._max_out
-
-        return self._intercept + self._slope*value
-          
+import time, datetime, json, sys, copy, multiprocessing, math
 
 class PantoneClock:
     """
-    Control a pantone clock attached to three GPIO pins.
+    Control a pantone clock attached to DIN (pin 18). 
     """
     
     def __init__(self,
-                 pin_numbers,
                  seconds_per_cycle=86400,
                  pantone_zero_position=240,
                  counterclockwise=True,
@@ -101,7 +38,6 @@ class PantoneClock:
                  brightness=1.0,
                  min_brightness=0.05):
         """
-        pin_numbers: list or tuple of 3 GPIO pins (BCM numbering)
         seconds_per_cycle: number of seconds that it takes to sweep the entire
                            RGB wheel.  86400 s corresponds to 24 hr
         pantone_zero_position: wheel position, in degrees, corresponding to 0
@@ -117,12 +53,6 @@ class PantoneClock:
         min_brightness: minimum brightness of clock
         """
 
-        # Argument sanity checks
-        self._pin_numbers = pin_numbers[:]
-        if len(self._pin_numbers) != 3:
-            err = "clock requires three GPIO pins.\n"
-            raise ValueError(err)
-        
         self._sec_per_cycle = seconds_per_cycle
         if self._sec_per_cycle <= 0:
             err = "seconds_per_cycle must be greater than zero.\n"
@@ -146,13 +76,6 @@ class PantoneClock:
             err = "minimum brightness must be between 0 and 1.\n"
             raise ValueError(err)
 
-        # Configure GPIO pins
-        self._pins = []
-        #for pin in self._pin_numbers:
-            #GPIO.setup(pin,GPIO.OUT)
-            #self._pins.append(GPIO.PWM(pin,50))
-            #self._pins[-1].start(50)
-
         # Put starting position in terms of a fraction of the total
         # sweep 
         fx_pantone_zero = self._pantone_zero_position % 360
@@ -167,6 +90,9 @@ class PantoneClock:
 
         # Configure intervals for cycling the clock
         self._intervals = [1/6.,3/6.,4/6.]
+
+        # Currently no led
+        self._led = None
 
         # Currently no light sensor
         self._light_sensor = None
@@ -235,11 +161,13 @@ class PantoneClock:
         # This keeps the intensity the same, whether light is coming from
         # one or two output channels
         total = sum(self.rgb)
+        values = []
         for i in range(3):
-            value = bright_scalar*100*self.rgb[i]/total
-            print(value,end=" ")
-        #    self._pins[i].ChangeDutyCycle(value)
-        print("")
+            values.append(int(math.floor(bright_scalar*255*self.rgb[i]/total)))
+
+        values = tuple(values)
+        if self._led is not None:
+            self._led.set(values)
 
     def _run(self):
         """
@@ -275,6 +203,17 @@ class PantoneClock:
 
         self._process.terminate()
         self._running = False
+
+    def add_led(self,led):
+        """
+        """
+
+        self._led = led
+        try:
+            self._led.set
+        except AttributeError:
+            err = "LEDs not available.  Must have 'set' attribute.\n"
+            raise ValueError(err)
 
     def add_ambient_light_sensor(self,light_sensor):
         """
@@ -328,46 +267,4 @@ class PantoneClock:
         else:
             return self._light_sensor.brightness
                 
-
-def main(argv=None):
-
-    if argv is None:
-        argv = sys.argv[1:]
-
-    # Parse command line
-    try:
-        control_file = argv[0]
-    except IndexError:
-        err = "Incorrect arguments. Usage:\n\n{}\n\n".format(__usage__)
-        raise ValueError(err)
-
-    # load in json file
-    data = json.loads(open(control_file,'r').read())
-
-    # Parse configuration file.  Keys should be keyword arguments to 
-    # PantoneClock.__init__.  The key "ambient" is a special key that should
-    # point to a dictionary of keywords to be passed to 
-    # AmbientLightSensor.__init__.
-    ambient_kwargs = {}
-    pantone_kwargs = {}
-    for k in data.keys():
-        if k == "ambient":
-            ambient_kwargs = copy.deepcopy(data[k])
-        else:
-            pantone_kwargs[k] = copy.deepcopy(data[k])
-
-    # Create clock 
-    clock = PantoneClock(**pantone_kwargs) 
-    
-    # Potentially create an ambient light sensor
-    if len(ambient_kwargs) > 0:
-        light_sensor = AmbientLightSensor(**ambient_kwargs)
-        clock.add_ambient_light_sensor(light_sensor)
-   
-    # Start the clock 
-    clock.start() 
-  
-
-if __name__ == "__main__":
-    main()
 
