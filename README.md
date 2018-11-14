@@ -37,7 +37,17 @@ clock.add_led(led)
 clock.start()
 ```
 
-## Prepping the pi
++ The ambient light sensor and LEDs are optional.  (Of course, if you don't load
+  the LEDs, the program won't do anything particularly interesting).
++ To see what options you have for tweaking the clock output, run `python3` on
+  the command line.  Then run the following:
+
+  ```python
+  import pantone
+  help(pantone.PantoneClock)
+  ```
+
+## Installation
 
 ### Activate I2C 
 
@@ -45,22 +55,21 @@ clock.start()
 2. Select `P5 I2C` and hit `Enter.`  
 3. Reboot the pi.
 
-### Install pip3 and git
+### Install git
 
-1. At the command line, run `sudo apt-get install pip3 git`
+1. At the command line, run `sudo apt-get install git`
 2. Answer `Y` to any prompts.
 
 ### Install pantone clock
 
 1. Clone the `pantone` git repository.  At the command line, run
    `git clone https://github.com/harmsm/pantone.git`
-2. Install the pantone clock.  Run either:
-    A. `sudo pip3 install pantone` OR
-    B. `cd pantone` followed by `sudo python3 setup.py install` 
+2. Install the pantone clock.  Run `cd pantone` followed by
+   `sudo python3 setup.py install` 
 
 ### Running the clock
-1. At the command line, run `cd pantone/example`.  This will put you in a 
-   directory with a script called `run_clock.py`.  
+1. At the command line, navigate into the `pantone/example` directory.  This 
+   directory has a script called `run_clock.py`.  
 2. Run `sudo python3 run_clock.py`.  If the hardware is configured correctly,
    the clock should start running.
 
@@ -71,14 +80,41 @@ clock.start()
 2. Open the `/etc/rc.local` file in an editor (`nano /etc/rc.local`).  
 3. Somewhere before the line reading `exit 0` put the line:
 
-```
-python3 /home/hermione/pantone/example/run_clock.py &
-```
+   ```
+   python3 /home/hermione/pantone/example/run_clock.py &
+   ```
 
-replacing the path with the one you copied above.  Thie `&` is critical.  If 
-you do not include it, the pi will not boot!
+   replacing the path with the one you copied above.  Thie `&` is critical.  If 
+   you do not include it, the pi will not boot!
 4. Save the file and reboot the pi. 
 
 ## Hardware
 
+### Parts list
+
++ Raspberry pi with necessary accessories (power supply, SD card, header pins,
+  case)
++ 74AHCT125 logic-level converter OR 1N4001 diode to allow 3.3V logic on pi to
+  interface with 5V logic on LED array diode. [See here](https://learn.adafruit.com/neopixels-on-raspberry-pi/raspberry-pi-wiring).
++ String of WS2812 LEDs.
++ MJMCU 3216 ambient light sensor.  (If you use a different light sensor, it
+  must connect via SDA/SCL.  You may have to change the addresses in the file
+  `pantone/light_sensor/cjmcu3216.py`.  If you end up writing a driver for a 
+  different light sensor, feel free to make a pull request for this project). 
++ Appropriate wires
+
+### Design
+
+![design here](https://github.com/harmsm/pantone/raw/master/design/pantone-clock.png)
+
++ I used a proximity sensor with similar pins in the diagram (not the MJMCU 
+  3216) to avoid having to make a fritzing part just for this picture. 
++ The light sensor is powered by 3.3 V pin and connects via SDA/SCL pins
++ The LED array is powered by a 5 V pin and connects via the D18 pin.  
+
+**NOTE.  This design powers the LED array off of the 5V pin on the raspberry 
+pi.  This works for <= 15 LEDs before exceeding the current available on that
+pin.  It also assumes you are not powering other peripherals (with the 
+exception of the ambient light sensor.  If you want to have more LEDs, use
+an external 5V power supply.  [See here](https://learn.adafruit.com/neopixels-on-raspberry-pi/raspberry-pi-wiring).**
 
