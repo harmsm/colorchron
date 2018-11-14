@@ -49,6 +49,20 @@ clock.start()
 
 ## Installation
 
+### Set up the pi
+
+You will need a raspberry pi running a (relatively) recent operating system that
+has python3 available in the package manager.  The instructions below are known
+to work work for raspbian stretch light (kernel 4.14).  
+
+The clock uses the system time to determine its color.  If you want the time to
+be set automatically, you need to configure the pi to be on the internet while
+the clock is running.  If you want to set the date manually, run:
+
+```
+sudo date -s '2018-11-14 11:26:00'
+```
+
 ### Activate I2C 
 
 1. At the command line, run `sudo raspi-config`
@@ -90,6 +104,9 @@ clock.start()
 
 ## Hardware
 
+[fritzing](https://http://fritzing.org) design files and pictures are of the
+build available in the `design/` directory.
+
 ### Parts list
 
 + Raspberry pi with necessary accessories (power supply, SD card, header pins,
@@ -101,7 +118,7 @@ clock.start()
   must connect via SDA/SCL.  You may have to change the addresses in the file
   `pantone/light_sensor/cjmcu3216.py`.  If you end up writing a driver for a 
   different light sensor, feel free to make a pull request for this project). 
-+ Appropriate wires
++ Appropriate wires. 
 
 ### Design
 
@@ -112,9 +129,16 @@ clock.start()
 + The light sensor is powered by 3.3 V pin and connects via SDA/SCL pins
 + The LED array is powered by a 5 V pin and connects via the D18 pin.  
 
+
 **NOTE.  This design powers the LED array off of the 5V pin on the raspberry 
 pi.  This works for <= 15 LEDs before exceeding the current available on that
 pin.  It also assumes you are not powering other peripherals (with the 
 exception of the ambient light sensor.  If you want to have more LEDs, use
 an external 5V power supply.  [See here](https://learn.adafruit.com/neopixels-on-raspberry-pi/raspberry-pi-wiring).**
 
+### Implementation
+
++ I ended up soldering the 74AHCT125 logic level converter into a prototype
+  board to avoid a huge number of jumper wires. 
+
+![logic level](https://github.com/harmsm/pantone/raw/master/design/level-shift-board.png)

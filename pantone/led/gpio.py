@@ -32,5 +32,6 @@ class GPIO(LED):
 
         for i in range(3):
 
-            self._pins[i].ChangeDutyCycle(value)
+            freq = 100*value/255
+            self._pins[i].ChangeDutyCycle(freq)
 
