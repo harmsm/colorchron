@@ -1,6 +1,6 @@
 # Pantone Clock
 
-Software for using a raspberry pi to drive RGB LED(s) as a pantone clock.
+#### Software for using a raspberry pi to drive RGB LED(s) as a pantone clock.
 
 The software uses an RGB value to represent time.  Using the default
 configuration, the clock will start at blue and then sweep around the RGB
@@ -24,7 +24,7 @@ run after it spawns.
 
 
 ### Basic example script
-```
+```python
 import pantone
 
 clock = pantone.PantoneClock()
