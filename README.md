@@ -127,7 +127,7 @@ build available in the `design/` directory.
 
 ### Design
 
-![design here](https://github.com/harmsm/colorchron/raw/master/design/colorchron-clock.png)
+![design here](https://github.com/harmsm/colorchron/raw/master/design/colorchron.png)
 
 + In the diagram, I used a proximity sensor with similar pins instead of an 
   MJMCU3216 to avoid making a special fritzing part just for this picture. 
