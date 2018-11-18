@@ -32,7 +32,7 @@ class ColorWheel:
         self._three_channel = [0.,0.,0.]
         self._three_channel_offsets = []
         for i in range(3):
-            v = self._fx_zero + i*self._seconds_per_cycle/3
+            v = (self._fx_zero + i/3)*self._seconds_per_cycle
             self._three_channel_offsets.append(v)
 
         # Configure intervals for cycling the clock
