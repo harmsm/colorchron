@@ -40,7 +40,7 @@ class HSV(ColorWheel):
 
     def __init__(self,
                  seconds_per_cycle=86400,
-                 pantone_zero_position=240,
+                 zero_position=240,
                  counterclockwise=True,
                  saturation=1.0,
                  value=1.0):
@@ -49,7 +49,7 @@ class HSV(ColorWheel):
         self._value = value
 
         super().__init__(seconds_per_cycle,
-                         pantone_zero_position,
+                         zero_position,
                          counterclockwise)
     
     def rgb(self,time):
