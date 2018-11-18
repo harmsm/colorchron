@@ -1,2 +1,2 @@
 
-from .wheels import RGB, CMY, HSV, RYB
+from .wheels import RGB, CMY, HSV, RYB, Chromachron

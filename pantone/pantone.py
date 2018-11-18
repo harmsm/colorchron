@@ -83,7 +83,7 @@ class PantoneClock:
         total = sum(self.rgb)
         values = []
         for i in range(3):
-            values.append(int(math.round(255*bright_scalar*self.rgb[i]/total,0)))
+            values.append(int(round(255*bright_scalar*self.rgb[i]/total,0)))
 
         # Set the LEDs to have desired RGB valuse
         values = tuple(values)

@@ -8,6 +8,7 @@ __author__ = "Michael J. Harms"
 __date__ = "2018-11-15"
 
 from .base import ColorWheel
+from . import rxb
 import colorsys, math
 
 class RGB(ColorWheel):
@@ -41,13 +42,13 @@ class HSV(ColorWheel):
                  seconds_per_cycle=86400,
                  pantone_zero_position=240,
                  counterclockwise=True,
-                 saturation=1.0,value=1.0):
+                 saturation=1.0,
+                 value=1.0):
 
         self._saturation = saturation
         self._value = value
 
-        super().__init__(self,
-                         seconds_per_cycle,
+        super().__init__(seconds_per_cycle,
                          pantone_zero_position,
                          counterclockwise)
     
@@ -86,4 +87,26 @@ class RYB(ColorWheel):
         return [math.ceil(255*v) for v in values]
 
 
+class Chromachron(ColorWheel):
 
+    _values = [[255,235,35],
+               [255,125, 25],
+               [255,194,195],
+               [214, 34, 45],
+               [255,105,205],
+               [185, 40,165],
+               [ 65, 65,184],
+               [ 45,125, 45],
+               [  5,195,195],
+               [155, 75, 55],
+               [255,215,185],
+               [205,155,106]]
+
+    def rgb(self,time):
+
+        time_value = self.get_single_channel(time)
+       
+        index = math.floor(time_value*len(self._values))
+
+        return self._values[index]
+     

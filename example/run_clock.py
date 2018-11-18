@@ -3,10 +3,10 @@
 import pantone
 
 # create clock instance
-clock = pantone.PantoneClock()
+clock = pantone.PantoneClock() 
 
 # create colorwheel, led, and light sensor instances
-colorwheel = pantone.colorwheel.RYB()
+colorwheel = pantone.colorwheel.Chromachron(seconds_per_cycle=60)
 led = pantone.led.Neopixel()
 light_sensor = pantone.light_sensor.CJMCU3216()
 

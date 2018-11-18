@@ -1,4 +1,4 @@
 from .pantone import PantoneClock
-from . import colorwheels
-#from . import led
-#from . import light_sensor
+from . import colorwheel
+from . import led
+from . import light_sensor

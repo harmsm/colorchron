@@ -4,7 +4,7 @@ class ColorWheel:
     def __init__(self,
                  seconds_per_cycle=86400,
                  zero_position=240,
-                 counterclockwise=True):
+                 counterclockwise=False):
         """
         seconds_per_cycle: number of seconds that it takes to sweep the entire
                            wheel.  86400 s corresponds to 24 hr

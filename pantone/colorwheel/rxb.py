@@ -21,36 +21,36 @@ def _cubic_interpolate(t, A, B):
 
 def _get_red(iR, iY, iB, magic):
 
-    x0 = self._cubic_interpolate(iB, magic[0][0], magic[4][0])
-    x1 = self._cubic_interpolate(iB, magic[1][0], magic[5][0])
-    x2 = self._cubic_interpolate(iB, magic[2][0], magic[6][0])
-    x3 = self._cubic_interpolate(iB, magic[3][0], magic[7][0])
-    y0 = self._cubic_interpolate(iY, x0, x1)
-    y1 = self._cubic_interpolate(iY, x2, x3)
+    x0 = _cubic_interpolate(iB, magic[0][0], magic[4][0])
+    x1 = _cubic_interpolate(iB, magic[1][0], magic[5][0])
+    x2 = _cubic_interpolate(iB, magic[2][0], magic[6][0])
+    x3 = _cubic_interpolate(iB, magic[3][0], magic[7][0])
+    y0 = _cubic_interpolate(iY, x0, x1)
+    y1 = _cubic_interpolate(iY, x2, x3)
 
-    return self._cubic_interpolate(iR, y0, y1)
+    return _cubic_interpolate(iR, y0, y1)
 
 def _get_green(iR, iY, iB, magic):
 
-    x0 = self._cubic_interpolate(iB, magic[0][1], magic[4][1])
-    x1 = self._cubic_interpolate(iB, magic[1][1], magic[5][1])
-    x2 = self._cubic_interpolate(iB, magic[2][1], magic[6][1])
-    x3 = self._cubic_interpolate(iB, magic[3][1], magic[7][1])
-    y0 = self._cubic_interpolate(iY, x0, x1)
-    y1 = self._cubic_interpolate(iY, x2, x3)
+    x0 = _cubic_interpolate(iB, magic[0][1], magic[4][1])
+    x1 = _cubic_interpolate(iB, magic[1][1], magic[5][1])
+    x2 = _cubic_interpolate(iB, magic[2][1], magic[6][1])
+    x3 = _cubic_interpolate(iB, magic[3][1], magic[7][1])
+    y0 = _cubic_interpolate(iY, x0, x1)
+    y1 = _cubic_interpolate(iY, x2, x3)
   
-    return self._cubic_interpolate(iR, y0, y1)
+    return _cubic_interpolate(iR, y0, y1)
 
 def _get_blue(iR, iY, iB, magic):
 
-    x0 = self._cubic_interpolate(iB, magic[0][2], magic[4][2])
-    x1 = self._cubic_interpolate(iB, magic[1][2], magic[5][2])
-    x2 = self._cubic_interpolate(iB, magic[2][2], magic[6][2])
-    x3 = self._cubic_interpolate(iB, magic[3][2], magic[7][2])
-    y0 = self._cubic_interpolate(iY, x0, x1)
-    y1 = self._cubic_interpolate(iY, x2, x3)
+    x0 = _cubic_interpolate(iB, magic[0][2], magic[4][2])
+    x1 = _cubic_interpolate(iB, magic[1][2], magic[5][2])
+    x2 = _cubic_interpolate(iB, magic[2][2], magic[6][2])
+    x3 = _cubic_interpolate(iB, magic[3][2], magic[7][2])
+    y0 = _cubic_interpolate(iY, x0, x1)
+    y1 = _cubic_interpolate(iY, x2, x3)
 
-    return self._cubic_interpolate(iR, y0, y1)
+    return _cubic_interpolate(iR, y0, y1)
 
 def rxb_to_rgb(values, magic):
     """
@@ -77,9 +77,9 @@ def rxb_to_rgb(values, magic):
     
         raise ValueError(err)
 
-    R1 = self._get_red(*values, magic)
-    G1 = self._get_green(*values, magic)
-    B1 = self._get_blue(*values, magic)
+    R1 = _get_red(*values, magic)
+    G1 = _get_green(*values, magic)
+    B1 = _get_blue(*values, magic)
 
     rgb = [math.ceil(R1 * 255),
            math.ceil(G1 * 255),
