@@ -3,11 +3,12 @@
 import colorchron
 
 # create clock instance
-clock = colorchron.Clock() 
+clock = colorchron.Clock()
 
 # create colorwheel, led, and light sensor instances
-colorwheel = colorchron.colorwheel.RGY(seconds_per_cycle=60,
-                                       counterclockwise=True,
+
+# Runs for 24 hour cycle by default
+colorwheel = colorchron.colorwheel.RYB(counterclockwise=True,
                                        zero_position=240)
 led = colorchron.led.Neopixel()
 light_sensor = colorchron.light_sensor.CJMCU3216()
