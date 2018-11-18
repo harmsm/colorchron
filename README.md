@@ -1,10 +1,15 @@
 # Pantone Clock
 
-#### Software for using a raspberry pi to drive RGB LED(s) as a pantone clock.
+#### A physical clock that represents the current time using LED color
 
-The software uses an RGB value to represent time.  Using the default
-configuration, the clock will start at blue and then sweep around the RGB
-colorwheel counterclockwise over 24 hours.  
+This project uses a raspberry pi to show the time using the color value of a
+collection of LEDs.  This was inspired by work such as 
+[what color is it?](http://whatcolorisit.sumbioun.com/), 
+the [colour clock](http://thecolourclock.co.uk/), and the famous
+[chromachron watch](https://www.hodinkee.com/articles/chromachron-a-radically-new-approach-to-time).
+
+Using the default configuration, the clock will start at 
+blue and then sweep around the RGB colorwheel counterclockwise over 24 hours.  
 
 |  time | color   |
 |-------|---------|
@@ -15,13 +20,9 @@ colorwheel counterclockwise over 24 hours.
 | 16:00 | red     |
 | 20:00 | magenta |
 
-The clock can also incorporate an ambient light sensor that dims the clock in
-the dark.
 
-A clock instance can be created, started, and 
-stopped.  The clock runs on its own thread, so other processes may
-run after it spawns.
-
+The clock can also incorporate an ambient light sensor that tunes the brightness
+of the clock so it is brighter in daylight and dimmer at night.
 
 ### Basic example script
 ```python
@@ -98,9 +99,10 @@ sudo date -s '2018-11-14 11:26:00'
    python3 /home/hermione/pantone/example/run_clock.py &
    ```
 
-   replacing the path with the one you copied above.  Thie `&` is critical.  If 
-   you do not include it, the pi will not boot!
-4. Save the file and reboot the pi. 
+   replacing the path with the one you copied above.  **The `&` is critical.  If 
+   you do not include it, the pi will not boot!**
+4. Save the file and reboot the pi.  The clock LEDs should light up as soon 
+   as the pi finishes booting, even if you do not log in.
 
 ## Hardware
 
@@ -124,16 +126,15 @@ build available in the `design/` directory.
 
 ![design here](https://github.com/harmsm/pantone/raw/master/design/pantone-clock.png)
 
-+ I used a proximity sensor with similar pins in the diagram (not the MJMCU 
-  3216) to avoid having to make a fritzing part just for this picture. 
++ I used a proximity sensor with similar pins instead of an MJMCU3216 in the
+  diagram to avoid making a special fritzing part just for this picture. 
 + The light sensor is powered by 3.3 V pin and connects via SDA/SCL pins
 + The LED array is powered by a 5 V pin and connects via the D18 pin.  
-
 
 **NOTE.  This design powers the LED array off of the 5V pin on the raspberry 
 pi.  This works for <= 15 LEDs before exceeding the current available on that
 pin.  It also assumes you are not powering other peripherals (with the 
-exception of the ambient light sensor.  If you want to have more LEDs, use
+exception of the ambient light sensor).  If you want to have more LEDs, use
 an external 5V power supply.  [See here](https://learn.adafruit.com/neopixels-on-raspberry-pi/raspberry-pi-wiring).**
 
 ### Implementation
