@@ -1,4 +1,4 @@
-# Pantone Clock
+# Colorchron
 
 #### A physical clock that represents the current time using LED color
 
@@ -26,12 +26,14 @@ of the clock so it is brighter in daylight and dimmer at night.
 
 ### Basic example script
 ```python
-import pantone
+import colorchron
 
-clock = pantone.PantoneClock()
-led = pantone.led.Neopixel()
-light_sensor = pantone.light_sensor.CJMCU3216()
+clock = colorchron.Clock()
+colorwheel = colorchron.colorwheel.RGB()
+led = colorchron.led.Neopixel()
+light_sensor = colorchron.light_sensor.CJMCU3216()
 
+clock.add_colorwheel(colorwheel)
 clock.add_ambient_light_sensor(light_sensor)
 clock.add_led(led)
 
@@ -44,8 +46,8 @@ clock.start()
   the command line.  Then run the following:
 
   ```python
-  import pantone
-  help(pantone.PantoneClock)
+  import colorchron
+  help(colorchron.Clock)
   ```
 
 ## Installation
@@ -75,32 +77,32 @@ sudo date -s '2018-11-14 11:26:00'
 1. At the command line, run `sudo apt-get install git python3-smbus`
 2. Answer `Y` to any prompts.
 
-### Install pantone clock
+### Install colorchron clock
 
-1. Clone the `pantone` git repository.  At the command line, run
-   `git clone https://github.com/harmsm/pantone.git`
-2. Install the pantone clock.  Run `cd pantone` followed by
+1. Clone the `colorchron` git repository.  At the command line, run
+   `git clone https://github.com/harmsm/colorchron.git`
+2. Install the colorchron clock.  Run `cd colorchron` followed by
    `sudo python3 setup.py install` 
 
 ### Running the clock
-1. At the command line, navigate into the `pantone/example` directory.  This 
+1. At the command line, navigate into the `colorchron/example` directory.  This 
    directory has a script called `run_clock.py`.  
 2. Run `sudo python3 run_clock.py`.  If the hardware is configured correctly,
    the clock should start running.
 
 ### To start the clock on boot
-1. In the `pantone/example` directory, run the command `pwd`.  This should 
-   print out the path (something like `/home/hermione/pantone/example`). 
+1. In the `colorchron/example` directory, run the command `pwd`.  This should 
+   print out the path (something like `/home/hermione/colorchron/example`). 
    Select and copy the path. 
 2. Open the `/etc/rc.local` file in an editor (`nano /etc/rc.local`).  
 3. Somewhere before the line reading `exit 0` put the line:
 
    ```
-   python3 /home/hermione/pantone/example/run_clock.py &
+   python3 /home/hermione/colorchron/example/run_clock.py &
    ```
 
-   replacing the path with the one you copied above.  **The `&` is critical.  If 
-   you do not include it, the pi will not boot!**
+   replacing the path with the one you copied above.  **The `&` is critical.  
+   If you do not include it, the pi will not boot!**
 4. Save the file and reboot the pi.  The clock LEDs should light up as soon 
    as the pi finishes booting, even if you do not log in.
 
@@ -114,20 +116,21 @@ build available in the `design/` directory.
 + Raspberry pi with necessary accessories (power supply, SD card, header pins,
   case)
 + 74AHCT125 logic-level converter OR 1N4001 diode to allow 3.3V logic on pi to
-  interface with 5V logic on LED array diode. [See here](https://learn.adafruit.com/neopixels-on-raspberry-pi/raspberry-pi-wiring).
+  interface with 5V logic on LED array diode. 
+  [See here](https://learn.adafruit.com/neopixels-on-raspberry-pi/raspberry-pi-wiring).
 + String of WS2812 LEDs.
 + MJMCU 3216 ambient light sensor.  (If you use a different light sensor, it
   must connect via SDA/SCL.  You may have to change the addresses in the file
-  `pantone/light_sensor/cjmcu3216.py`.  If you end up writing a driver for a 
+  `colorchron/light_sensor/cjmcu3216.py`.  If you end up writing a driver for a 
   different light sensor, feel free to make a pull request for this project). 
 + Appropriate wires. 
 
 ### Design
 
-![design here](https://github.com/harmsm/pantone/raw/master/design/pantone-clock.png)
+![design here](https://github.com/harmsm/colorchron/raw/master/design/colorchron-clock.png)
 
-+ I used a proximity sensor with similar pins instead of an MJMCU3216 in the
-  diagram to avoid making a special fritzing part just for this picture. 
++ In the diagram, I used a proximity sensor with similar pins instead of an 
+  MJMCU3216 to avoid making a special fritzing part just for this picture. 
 + The light sensor is powered by 3.3 V pin and connects via SDA/SCL pins
 + The LED array is powered by a 5 V pin and connects via the D18 pin.  
 
@@ -142,4 +145,4 @@ an external 5V power supply.  [See here](https://learn.adafruit.com/neopixels-on
 + I ended up soldering the 74AHCT125 logic level converter into a prototype
   board to avoid a huge number of jumper wires. 
 
-![logic level](https://github.com/harmsm/pantone/raw/master/design/level-shift-board.png)
+![logic level](https://github.com/harmsm/colorchron/raw/master/design/level-shift-board.png)

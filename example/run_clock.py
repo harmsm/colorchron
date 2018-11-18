@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
                 
-import pantone
+import colorchron
 
 # create clock instance
-clock = pantone.PantoneClock() 
+clock = colorchron.Clock() 
 
 # create colorwheel, led, and light sensor instances
-colorwheel = pantone.colorwheel.Chromachron(seconds_per_cycle=60)
-led = pantone.led.Neopixel()
-light_sensor = pantone.light_sensor.CJMCU3216()
+colorwheel = colorchron.colorwheel.Chromachron(seconds_per_cycle=60)
+led = colorchron.led.Neopixel()
+light_sensor = colorchron.light_sensor.CJMCU3216()
 
 # append the color wheel, light sensor, and led to the clock
 clock.add_colorwheel(colorwheel)

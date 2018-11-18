@@ -9,15 +9,15 @@ if sys.version_info[0] < 3:
 from setuptools import setup, find_packages
 
 # Need to add all dependencies to setup as we go!
-setup(name='pantone',
+setup(name='colorchron',
       packages=find_packages(),
       version='0.1',
-      description="Software for using a raspberry pi to drive RGB LED(s) as a pantone clock.",
+      description="Software for using a raspberry pi to drive RGB LED(s) to represent time.",
       long_description=open("README.md").read(),
       author='Michael J. Harms',
       author_email='harmsm@gmail.com',
-      url='https://github.com/harmsm/pantone',
-      download_url='https://github.com/harmsm/pantone/tarball/0.1',
+      url='https://github.com/harmsm/colorchron',
+      download_url='https://github.com/harmsm/colorchron/tarball/0.1',
       zip_safe=False,
       install_requires=["rpi_ws281x","adafruit-circuitpython-neopixel"],
       classifiers=['Programming Language :: Python'])

@@ -7,9 +7,9 @@ __date__ = "2018-04-30"
 
 import time, datetime, json, sys, copy, multiprocessing, math
 
-class PantoneClock:
+class Clock:
     """
-    Control a pantone clock.
+    Control leds to display time as a color.
     """
     
     def __init__(self,
