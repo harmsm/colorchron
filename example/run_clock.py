@@ -6,7 +6,9 @@ import colorchron
 clock = colorchron.Clock() 
 
 # create colorwheel, led, and light sensor instances
-colorwheel = colorchron.colorwheel.Chromachron(seconds_per_cycle=60)
+colorwheel = colorchron.colorwheel.RGY(seconds_per_cycle=60,
+                                       counterclockwise=True,
+                                       zero_position=240)
 led = colorchron.led.Neopixel()
 light_sensor = colorchron.light_sensor.CJMCU3216()
 
