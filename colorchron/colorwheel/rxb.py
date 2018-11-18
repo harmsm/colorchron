@@ -56,7 +56,7 @@ def rxb_to_rgb(values, magic):
     """
     Take values on some (arbitrarily-defined) color wheel and spit them out as
     RGB values.  The input values are assumed to be between 0 and 1. The final
-    RGB values are between 0 and 255. 
+    RGB values are also been 0 and 1. 
 
     Magic defines the coordinate transformation.  It should be an 8x3 matrix 
     (see description).
@@ -81,9 +81,5 @@ def rxb_to_rgb(values, magic):
     G1 = _get_green(*values, magic)
     B1 = _get_blue(*values, magic)
 
-    rgb = [math.ceil(R1 * 255),
-           math.ceil(G1 * 255),
-           math.ceil(B1 * 255)]
-   
-    return rgb 
+    return [R1,G1,B1]
 
